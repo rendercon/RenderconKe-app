@@ -11,7 +11,7 @@
     "prettier:format": "prettier --write .",
     "prettier:check": "prettier --check .",
     "typecheck": "tsc --build",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watchAll",
     "validate": "concurrently --kill-others-on-fail -g -p \"[{name}]\" -n \"lint,prettier,typecheck,test\" \"npm:lint\" \"npm:prettier:check\" \"npm:typecheck\" \"npm:test\""
   },
@@ -23,6 +23,7 @@
     "@react-navigation/native": "^6.0.2",
     "expo": "~51.0.28",
     "expo-font": "~12.0.9",
+    "expo-image": "~1.12.15",
     "expo-linking": "~6.3.1",
     "expo-router": "~3.5.23",
     "expo-splash-screen": "~0.27.5",
@@ -35,13 +36,13 @@
     "react-native-reanimated": "~3.10.1",
     "react-native-safe-area-context": "4.10.5",
     "react-native-screens": "3.31.1",
-    "react-native-web": "~0.19.10",
-    "expo-image": "~1.12.15",
-    "react-native-svg": "15.2.0"
+    "react-native-svg": "15.2.0",
+    "react-native-web": "~0.19.10"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@types/react": "~18.2.45",
+    "concurrently": "^9.0.1",
     "eslint": "^8.57.0",
     "eslint-config-expo": "^7.1.2",
     "eslint-config-prettier": "^9.1.0",
