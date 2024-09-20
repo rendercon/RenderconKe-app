@@ -1,22 +1,21 @@
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import Speakers from '@/components/Speakers'; // Assuming you have the Speakers component in the right path
 import MainContainer from '@/components/containers/MainContainer';
 import StyledText from '@/components/common/StyledText';
 import { spacing } from '@/constants/Styles';
-// import Colors from '@/constants/Colors';
 
-const home = () => {
+const Home = () => {
   return (
     <MainContainer>
       <View style={styles.container}>
-        <StyledText size="lg" font="semiBold">
-          Speakers
-        </StyledText>
+        <Speakers />
       </View>
     </MainContainer>
   );
 };
 
-export default home;
+export default Home;
 
 const styles = StyleSheet.create({
   container: {
