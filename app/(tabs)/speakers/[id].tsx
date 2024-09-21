@@ -59,11 +59,7 @@ const SpeakerPage = () => {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.name}>{speaker.fullName}</Text>
-        <Image
-          source={{ uri: speaker.profilePicture }}
-          style={styles.image}
-          resizeMode="cover"
-        />
+        <Image source={{ uri: speaker.profilePicture }} style={styles.image} resizeMode="cover" />
         <Text style={styles.occupation}>{speaker.occupation}</Text>
       </View>
 

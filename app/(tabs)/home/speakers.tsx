@@ -13,8 +13,8 @@ const SpeakersTab = () => {
     setLoading(true);
     setError(false);
     try {
-      const res = await fetch("https://sessionize.com/api/v2/d899srzm/view/Speakers");
-      if (!res.ok) throw new Error("Failed to fetch speakers");
+      const res = await fetch('https://sessionize.com/api/v2/d899srzm/view/Speakers');
+      if (!res.ok) throw new Error('Failed to fetch speakers');
       const data = await res.json();
       setSpeakerList(data);
     } catch (error) {

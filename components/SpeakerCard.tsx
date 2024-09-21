@@ -10,13 +10,8 @@ interface SpeakerCardProps {
 const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
   return (
     <View style={styles.card}>
-      
       {speaker.profilePicture ? (
-        <Image
-          source={{ uri: speaker.profilePicture }}
-          style={styles.image}
-          resizeMode="cover"
-        />
+        <Image source={{ uri: speaker.profilePicture }} style={styles.image} resizeMode="cover" />
       ) : (
         <View style={styles.imageFallback}>
           <Text style={styles.imageFallbackText}>No Image</Text>
@@ -25,7 +20,7 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
       <View style={styles.textContainer}>
         <Text style={styles.name}>{speaker.fullName}</Text>
         <Link href={`/speakers/${speaker.id}`}>
-        <Text style={styles.occupation}>{speaker.sessions[0]?.name || 'Session you cant afford to miss!'}</Text>
+          <Text style={styles.occupation}>{speaker.sessions[0]?.name || 'Session you cant afford to miss!'}</Text>
         </Link>
       </View>
     </View>
@@ -77,7 +72,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#fff', // text color
     marginTop: 4,
-   
   },
 });
 

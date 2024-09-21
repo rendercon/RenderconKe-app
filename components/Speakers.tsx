@@ -14,8 +14,8 @@ const Speakers = () => {
     setLoading(true);
     setError(false);
     try {
-      const res = await fetch("https://sessionize.com/api/v2/d899srzm/view/Speakers");
-      if (!res.ok) throw new Error("Failed to fetch speakers");
+      const res = await fetch('https://sessionize.com/api/v2/d899srzm/view/Speakers');
+      if (!res.ok) throw new Error('Failed to fetch speakers');
       const data = await res.json();
       setSpeakerList(data);
     } catch (error) {
@@ -31,9 +31,9 @@ const Speakers = () => {
 
   return (
     <View style={styles.container}>
-        <StyledText size="lg" font="semiBold" style={styles.header}>
-          Speakers
-        </StyledText>
+      <StyledText size="lg" font="semiBold" style={styles.header}>
+        Speakers
+      </StyledText>
       {loading ? (
         <ActivityIndicator size="large" color={palette.palette.secondary} /> // Access secondary color correctly
       ) : error ? (
@@ -58,8 +58,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 24,
     fontWeight: '700',
-    color
-: '#eee712', // secondary color
+    color: '#eee712', // secondary color
     textAlign: 'left',
     marginBottom: 16,
   },
