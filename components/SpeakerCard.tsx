@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { Speaker } from './types'; // Import the Speaker type
+import { Link } from 'expo-router';
 
 interface SpeakerCardProps {
   speaker: Speaker;
@@ -9,6 +10,7 @@ interface SpeakerCardProps {
 const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
   return (
     <View style={styles.card}>
+      
       {speaker.profilePicture ? (
         <Image
           source={{ uri: speaker.profilePicture }}
@@ -22,7 +24,9 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
       )}
       <View style={styles.textContainer}>
         <Text style={styles.name}>{speaker.fullName}</Text>
+        <Link href={`/speakers/${speaker.id}`}>
         <Text style={styles.occupation}>{speaker.sessions[0]?.name || 'Session you cant afford to miss!'}</Text>
+        </Link>
       </View>
     </View>
   );
@@ -34,7 +38,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    padding: 8,
     marginBottom: 16,
     shadowColor: '#000',
     shadowOpacity: 0.25,
@@ -73,6 +77,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#fff', // text color
     marginTop: 4,
+   
   },
 });
 
