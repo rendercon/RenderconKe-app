@@ -2,8 +2,14 @@ import Colors from '@/constants/Colors';
 import type { StatusBarProps } from 'expo-status-bar';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import type { KeyboardAvoidingViewProps, ScrollViewProps, StyleProp, ViewStyle } from 'react-native';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import type {
+  ImageBackgroundProps,
+  KeyboardAvoidingViewProps,
+  ScrollViewProps,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
+import { ImageBackground, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import type { Edge, SafeAreaViewProps } from 'react-native-safe-area-context';
 import { SafeAreaProvider, SafeAreaView, initialWindowMetrics } from 'react-native-safe-area-context';
 
@@ -15,6 +21,8 @@ interface BaseScreenProps {
   KeyboardAvoidingViewProps?: KeyboardAvoidingViewProps;
   safeAreaEdges?: Edge[];
   style?: StyleProp<ViewStyle>;
+  backgroundImage?: ImageBackgroundProps['source'];
+  ImageBackgroundProps?: Omit<ImageBackgroundProps, 'source'>;
 }
 
 interface FixedScreenProps extends BaseScreenProps {
@@ -68,6 +76,8 @@ const MainContainer = (props: ScreenProps) => {
     keyboardOffset = 0,
     KeyboardAvoidingViewProps,
     style,
+    backgroundImage,
+    ImageBackgroundProps,
   } = props;
 
   const backgroundColor = Colors.palette.primary;
@@ -78,19 +88,28 @@ const MainContainer = (props: ScreenProps) => {
 
   const wrapperStyles = StyleSheet.compose(styles.container, style);
 
+  const Content = (
+    <KeyboardAvoidingView
+      behavior={isIos ? 'padding' : undefined}
+      keyboardVerticalOffset={keyboardOffset}
+      {...KeyboardAvoidingViewProps}
+      style={[styles.keyboard, KeyboardAvoidingViewProps?.style]}
+    >
+      {isNonScrolling(props.preset) ? <ScreenWithoutScrolling {...props} /> : <ScreenWithScrolling {...props} />}
+    </KeyboardAvoidingView>
+  );
+
   return (
     <SafeAreaProvider testID="main-container" initialMetrics={initialWindowMetrics}>
       <Wrapper edges={safeAreaEdges} {...SafeAreaViewProps} style={[{ backgroundColor }, wrapperStyles]}>
         <StatusBar style={statusBarStyle} {...StatusBarProps} />
-
-        <KeyboardAvoidingView
-          behavior={isIos ? 'padding' : undefined}
-          keyboardVerticalOffset={keyboardOffset}
-          {...KeyboardAvoidingViewProps}
-          style={[styles.keyboard, KeyboardAvoidingViewProps?.style]}
-        >
-          {isNonScrolling(props.preset) ? <ScreenWithoutScrolling {...props} /> : <ScreenWithScrolling {...props} />}
-        </KeyboardAvoidingView>
+        {backgroundImage ? (
+          <ImageBackground source={backgroundImage} style={styles.backgroundImage} {...ImageBackgroundProps}>
+            {Content}
+          </ImageBackground>
+        ) : (
+          Content
+        )}
       </Wrapper>
     </SafeAreaProvider>
   );
@@ -99,6 +118,7 @@ const MainContainer = (props: ScreenProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: Platform.OS === 'android' ? 60 : 40,
   },
   containerStyle: {
     width: '100%',
@@ -106,6 +126,11 @@ const styles = StyleSheet.create({
   },
   keyboard: {
     flex: 1,
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
   },
 });
 

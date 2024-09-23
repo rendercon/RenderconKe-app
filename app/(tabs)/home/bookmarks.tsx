@@ -6,7 +6,7 @@ import { spacing } from '@/constants/Styles';
 
 const home = () => {
   return (
-    <MainContainer>
+    <MainContainer backgroundImage={require('@/assets/images/bg.png')} ImageBackgroundProps={{ resizeMode: 'cover' }}>
       <View style={styles.container}>
         <StyledText size="lg" font="semiBold">
           Bookmarks

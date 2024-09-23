@@ -6,21 +6,42 @@ import Colors from '@/constants/Colors';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 import StyledText from '@/components/common/StyledText';
 import MainHeader from '@/components/headers/MainHeader';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StyleSheet, View } from 'react-native';
+import { spacing } from '@/constants/Styles';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: { name: React.ComponentProps<typeof MaterialCommunityIcons>['name']; color: string }) {
   return <MaterialCommunityIcons size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
+function CustomHeader() {
+  const insets = useSafeAreaInsets();
+  return (
+    <View style={[styles.headerContainer, { paddingTop: insets.top + spacing.sm, paddingHorizontal: spacing.lg }]}>
+      <MainHeader />
+    </View>
+  );
+}
+
 export default function TabLayout() {
-  //TODO: show tab labels if tab is focussed
+  const insets = useSafeAreaInsets();
+
+  const headerHeight = 120;
 
   return (
     <Tabs
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: Colors.palette.primary,
-          borderTopColor: Colors.palette.primary,
+          backgroundColor: Colors.palette.primary + '80',
+          borderTopColor: 'transparent',
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          elevation: 0,
+          height: 60 + insets.bottom,
+          paddingBottom: insets.bottom,
         },
         tabBarActiveTintColor: Colors.palette.secondary,
         tabBarInactiveTintColor: Colors.palette.text,
@@ -30,6 +51,13 @@ export default function TabLayout() {
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
+        headerTitleContainerStyle: {
+          width: '100%',
+        },
+        headerStyle: {
+          height: headerHeight,
+        },
+        header: () => <CustomHeader />,
       }}
     >
       <Tabs.Screen
@@ -41,14 +69,6 @@ export default function TabLayout() {
               Schedule
             </StyledText>
           ),
-          headerStyle: {
-            backgroundColor: Colors.palette.primary,
-            height: 120,
-            elevation: 0,
-            shadowOpacity: 0,
-            borderBottomWidth: 0,
-          },
-          headerTitle: () => <MainHeader />,
         }}
       />
       <Tabs.Screen
@@ -60,14 +80,6 @@ export default function TabLayout() {
               Bookmarked
             </StyledText>
           ),
-          headerStyle: {
-            backgroundColor: Colors.palette.primary,
-            height: 120,
-            elevation: 0,
-            shadowOpacity: 0,
-            borderBottomWidth: 0,
-          },
-          headerTitle: () => <MainHeader />,
         }}
       />
       <Tabs.Screen
@@ -79,14 +91,6 @@ export default function TabLayout() {
               Speakers
             </StyledText>
           ),
-          headerStyle: {
-            backgroundColor: Colors.palette.primary,
-            height: 110,
-            elevation: 0,
-            shadowOpacity: 0,
-            borderBottomWidth: 0,
-          },
-          headerTitle: () => <MainHeader />,
         }}
       />
       <Tabs.Screen
@@ -98,16 +102,19 @@ export default function TabLayout() {
               About
             </StyledText>
           ),
-          headerStyle: {
-            backgroundColor: Colors.palette.primary,
-            height: 120,
-            elevation: 0,
-            shadowOpacity: 0,
-            borderBottomWidth: 0,
-          },
-          headerTitle: () => <MainHeader />,
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  headerContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: Colors.palette.primary + 'CC', // Semi-transparent
+    height: 100,
+  },
+});
