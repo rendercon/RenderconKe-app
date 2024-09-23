@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 16,
-    color: palette.palette.secondary // Removed font size and color since StyledText handles that
+    color: palette.palette.secondary, // Removed font size and color since StyledText handles that
   },
   error: {
     textAlign: 'center',

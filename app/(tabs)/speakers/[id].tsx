@@ -21,7 +21,11 @@ const SpeakerPage = () => {
   }
 
   if (error || !speaker) {
-    return <StyledText variant="error" style={styles.error}>Speaker not found</StyledText>;
+    return (
+      <StyledText variant="error" style={styles.error}>
+        Speaker not found
+      </StyledText>
+    );
   }
 
   const toggleSaveSession = (sessionIndex: number) => {
@@ -32,9 +36,16 @@ const SpeakerPage = () => {
   };
 
   const socialMediaLinks = [
-    { name: 'twitter', url: speaker.socialMedia?.twitter || 'https://x.com/renderconke', icon: require('@/assets/images/x.png') },
-    { name: 'linkedin', url: speaker.socialMedia?.linkedin || 'https://www.linkedin.com/company/renderconke/', icon: require('@/assets/images/linkedin.png')
-     },
+    {
+      name: 'twitter',
+      url: speaker.socialMedia?.twitter || 'https://x.com/renderconke',
+      icon: require('@/assets/images/x.png'),
+    },
+    {
+      name: 'linkedin',
+      url: speaker.socialMedia?.linkedin || 'https://www.linkedin.com/company/renderconke/',
+      icon: require('@/assets/images/linkedin.png'),
+    },
   ];
 
   return (
@@ -45,12 +56,16 @@ const SpeakerPage = () => {
           <FontAwesome name="arrow-left" size={18} color={palette.palette.secondary} />
         </TouchableOpacity>
 
-        <SpeakerHeader name={speaker.fullName} occupation={speaker.occupation} profilePicture={speaker.profilePicture} />
-        
+        <SpeakerHeader
+          name={speaker.fullName}
+          occupation={speaker.occupation}
+          profilePicture={speaker.profilePicture}
+        />
+
         <StyledText size="md" variant="text" style={styles.bio}>
           {speaker.bio}
         </StyledText>
-        
+
         <View style={styles.socialMediaContainer}>
           {socialMediaLinks.map((social, index) => (
             <TouchableOpacity key={index} onPress={() => Linking.openURL(social.url)} style={styles.socialIconImage}>
@@ -90,7 +105,6 @@ const styles = StyleSheet.create({
     padding: 16,
     justifyContent: 'center',
     marginTop: 30,
-
   },
   backButton: {
     position: 'absolute',

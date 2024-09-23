@@ -15,7 +15,9 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
         <Image source={{ uri: speaker.profilePicture }} style={styles.image} resizeMode="cover" />
       ) : (
         <View style={styles.imageFallback}>
-          <StyledText size="xs" font="light" style={styles.imageFallbackText}>No Image</StyledText>
+          <StyledText size="xs" font="light" style={styles.imageFallbackText}>
+            No Image
+          </StyledText>
         </View>
       )}
       <View style={styles.textContainer}>

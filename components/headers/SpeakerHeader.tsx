@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
   },
   name: {
     marginBottom: 8,
-    color: palette.palette.secondary
+    color: palette.palette.secondary,
   },
   image: {
     width: 150,
