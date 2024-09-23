@@ -52,7 +52,12 @@ const SpeakerPage = () => {
   };
 
   return (
-    <MainContainer backgroundImage={require('@/assets/images/bg.png')} ImageBackgroundProps={{ resizeMode: 'cover' }}>
+    <MainContainer
+      backgroundImage={require('@/assets/images/bg.png')}
+      ImageBackgroundProps={{ resizeMode: 'cover' }}
+      preset="scroll"
+      safeAreaEdges={['top']}
+    >
       <View style={styles.container}>
         <View style={styles.header}>
           <Pressable
@@ -115,7 +120,6 @@ const styles = StyleSheet.create({
   error: {
     color: Colors.palette.error,
     textAlign: 'center',
-    marginTop: 20,
   },
   header: {
     width: '100%',

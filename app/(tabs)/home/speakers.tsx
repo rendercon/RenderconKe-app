@@ -12,7 +12,12 @@ const Speakers = () => {
   const { speakerList, loading, error } = useFetchSpeakers();
 
   return (
-    <MainContainer backgroundImage={require('@/assets/images/bg.png')} ImageBackgroundProps={{ resizeMode: 'cover' }}>
+    <MainContainer
+      backgroundImage={require('@/assets/images/bg.png')}
+      ImageBackgroundProps={{ resizeMode: 'cover' }}
+      preset="fixed"
+      safeAreaEdges={['top']}
+    >
       <View style={styles.container}>
         <StyledText size="xl" font="semiBold" style={styles.header}>
           Speakers
@@ -30,6 +35,11 @@ const Speakers = () => {
               <SpeakerCard speaker={item} onPress={() => router.push(`/speakers/${item.id}`)} />
             )}
             keyExtractor={(item) => item.id}
+            getItemLayout={(_, index) => ({
+              length: 100,
+              offset: 100 * index,
+              index,
+            })}
           />
         )}
       </View>
@@ -40,7 +50,9 @@ const Speakers = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    paddingTop: sizes.header,
+    paddingHorizontal: sizes.md,
+    paddingBottom: sizes.md,
   },
   header: {
     color: Colors.palette.secondary,

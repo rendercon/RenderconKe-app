@@ -33,7 +33,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: Colors.palette.primary + '80',
+          backgroundColor: Colors.palette.primary + 'cc',
           borderTopColor: 'transparent',
           position: 'absolute',
           bottom: 0,
