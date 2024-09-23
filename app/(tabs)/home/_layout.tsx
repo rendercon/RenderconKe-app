@@ -27,7 +27,7 @@ function CustomHeader() {
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
 
-  const headerHeight = 120;
+  const headerHeight = 90;
 
   return (
     <Tabs

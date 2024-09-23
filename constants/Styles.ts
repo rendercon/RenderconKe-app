@@ -8,6 +8,7 @@ export const sizes = {
   header: 60,
   card: 220,
   cardImage: 150,
+  galleryImage: 200,
 } as const;
 
 // margins and padding
