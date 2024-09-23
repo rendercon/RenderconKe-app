@@ -15,13 +15,13 @@ export const useFetchSpeakers = () => {
         if (!res.ok) throw new Error('Failed to fetch speakers');
         const data = await res.json();
         setSpeakerList(data);
-      } catch (error) {
+      } catch (err) {
         setError(true);
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchSpeakers();
   }, []);
 

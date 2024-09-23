@@ -38,7 +38,7 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker, onPress }) => {
         <StyledText size="lg" font="bold" style={styles.name}>
           {speaker.fullName}
         </StyledText>
-        <StyledText>{speaker?.tagLine}</StyledText>
+        <StyledText size="sm">{speaker?.tagLine}</StyledText>
       </View>
     </Pressable>
   );

@@ -35,11 +35,9 @@ const Speakers = () => {
               <SpeakerCard speaker={item} onPress={() => router.push(`/speakers/${item.id}`)} />
             )}
             keyExtractor={(item) => item.id}
-            getItemLayout={(_, index) => ({
-              length: 100,
-              offset: 100 * index,
-              index,
-            })}
+            initialNumToRender={10}
+            maxToRenderPerBatch={10}
+            showsVerticalScrollIndicator={false}
           />
         )}
       </View>
