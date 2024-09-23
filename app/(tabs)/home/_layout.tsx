@@ -81,7 +81,7 @@ export default function TabLayout() {
           ),
           headerStyle: {
             backgroundColor: Colors.palette.primary,
-            height: 120,
+            height: 110,
             elevation: 0,
             shadowOpacity: 0,
             borderBottomWidth: 0,

@@ -1,107 +1,103 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ActivityIndicator, ScrollView, Linking } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import React, { useState, useMemo } from 'react';
+import { View, ScrollView, ActivityIndicator, StyleSheet, TouchableOpacity, Linking, Image } from 'react-native';
+import { Stack, useLocalSearchParams, useNavigation } from 'expo-router';
 import palette from '@/constants/Colors';
-import { FontAwesome } from '@expo/vector-icons'; // Importing FontAwesome icons for Twitter (X) and LinkedIn
-
-type Speaker = {
-  id: string;
-  fullName: string;
-  profilePicture: string;
-  occupation: string;
-  bio: string;
-  socialMedia?: {
-    twitter?: string;
-    linkedin?: string;
-  };
-  sessions: {
-    time: string;
-    title: string;
-  }[];
-};
+import { useFetchSpeakers } from '@/hooks/useFetchSpeakers';
+import SpeakerHeader from '@/components/headers/SpeakerHeader';
+import BackgroundWrapper from '@/components/containers/BackgroundWrapper';
+import StyledText from '@/components/common/StyledText';
+import { FontAwesome } from '@expo/vector-icons';
 
 const SpeakerPage = () => {
   const { id } = useLocalSearchParams(); // Fetch dynamic ID from route
-  const [speaker, setSpeaker] = useState<Speaker | null>(null);
-  const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
+  const { speakerList, loading, error } = useFetchSpeakers();
+  const [savedSessions, setSavedSessions] = useState<{ [key: string]: boolean }>({});
 
-  useEffect(() => {
-    // Simulate fetching the speaker data based on the dynamic ID
-    const fetchSpeaker = async () => {
-      try {
-        const res = await fetch(`https://sessionize.com/api/v2/d899srzm/view/Speakers`);
-        const data = await res.json();
-        const speakerData = data.find((s: Speaker) => s.id === id); // Find speaker by dynamic ID
-        setSpeaker(speakerData);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSpeaker();
-  }, [id]);
+  const speaker = useMemo(() => speakerList.find((s) => s.id === id), [speakerList, id]);
 
   if (loading) {
     return <ActivityIndicator size="large" color={palette.palette.secondary} style={styles.loader} />;
   }
 
-  if (!speaker) {
-    return <Text style={styles.error}>Speaker not found</Text>;
+  if (error || !speaker) {
+    return <StyledText variant="error" style={styles.error}>Speaker not found</StyledText>;
   }
 
-  // Fallbacks for social media links
-  const twitterLink = speaker.socialMedia?.twitter || 'https://twitter.com'; // Fallback Twitter link
-  const linkedinLink = speaker.socialMedia?.linkedin || 'https://linkedin.com'; // Fallback LinkedIn link
+  const toggleSaveSession = (sessionIndex: number) => {
+    setSavedSessions((prevState) => ({
+      ...prevState,
+      [sessionIndex]: !prevState[sessionIndex],
+    }));
+  };
+
+  const socialMediaLinks = [
+    { name: 'twitter', url: speaker.socialMedia?.twitter || 'https://x.com/renderconke', icon: require('@/assets/images/x.png') },
+    { name: 'linkedin', url: speaker.socialMedia?.linkedin || 'https://www.linkedin.com/company/renderconke/', icon: require('@/assets/images/linkedin.png')
+     },
+  ];
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.name}>{speaker.fullName}</Text>
-        <Image source={{ uri: speaker.profilePicture }} style={styles.image} resizeMode="cover" />
-        <Text style={styles.occupation}>{speaker.occupation}</Text>
-      </View>
+    <BackgroundWrapper>
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Back Button */}
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <FontAwesome name="arrow-left" size={18} color={palette.palette.secondary} />
+        </TouchableOpacity>
 
-      <View style={styles.socialMediaContainer}>
-        <FontAwesome
-          name="twitter"
-          size={40}
-          color="#1DA1F2"
-          onPress={() => openURL(twitterLink)}
-          style={styles.socialIcon}
-        />
-        <FontAwesome
-          name="linkedin"
-          size={40}
-          color="#0077B5"
-          onPress={() => openURL(linkedinLink)}
-          style={styles.socialIcon}
-        />
-      </View>
-
-      <Text style={styles.bio}>{speaker.bio}</Text>
-
-      {speaker.sessions.map((session, index) => (
-        <View key={index} style={styles.sessionCard}>
-          <Text style={styles.sessionTime}>{session.time}</Text>
-          <Text style={styles.sessionTitle}>{session.title}</Text>
+        <SpeakerHeader name={speaker.fullName} occupation={speaker.occupation} profilePicture={speaker.profilePicture} />
+        
+        <StyledText size="md" variant="text" style={styles.bio}>
+          {speaker.bio}
+        </StyledText>
+        
+        <View style={styles.socialMediaContainer}>
+          {socialMediaLinks.map((social, index) => (
+            <TouchableOpacity key={index} onPress={() => Linking.openURL(social.url)} style={styles.socialIconImage}>
+              <Image source={social.icon} />
+            </TouchableOpacity>
+          ))}
         </View>
-      ))}
-    </ScrollView>
-  );
-};
 
-const openURL = (url: string) => {
-  // Function to open social media links
-  Linking.openURL(url);
+        {speaker.sessions.map((session, index) => (
+          <View key={index} style={styles.sessionCard}>
+            <View style={styles.sessionHeader}>
+              <View>
+                <StyledText size="md" variant="text" style={styles.sessionTime}>
+                  {session.time}
+                </StyledText>
+                <StyledText size="sm" font="bold" style={styles.sessionTitle}>
+                  {session.name}
+                </StyledText>
+              </View>
+              <TouchableOpacity onPress={() => toggleSaveSession(index)}>
+                <FontAwesome
+                  name={savedSessions[index] ? 'bookmark' : 'bookmark-o'}
+                  size={20}
+                  color={savedSessions[index] ? palette.palette.secondary : '#ccc'}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+    </BackgroundWrapper>
+  );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: palette.palette.primary,
     padding: 16,
+    justifyContent: 'center',
+    marginTop: 30,
+
+  },
+  backButton: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    zIndex: 10,
+    padding: 8,
   },
   loader: {
     flex: 1,
@@ -109,61 +105,49 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   error: {
-    color: palette.palette.error,
     textAlign: 'center',
     marginTop: 20,
   },
-  header: {
-    alignItems: 'center',
+  bio: {
+    marginTop: 0,
     marginBottom: 20,
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: palette.palette.secondary,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginVertical: 16,
-  },
-  occupation: {
-    fontSize: 18,
-    color: palette.palette.secondary,
-    marginBottom: 12,
+    lineHeight: 22,
   },
   socialMediaContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginVertical: 12,
+    marginVertical: 15,
+    gap: 16,
   },
-  socialIcon: {
-    marginHorizontal: 15,
-  },
-  bio: {
-    fontSize: 14,
-    color: palette.palette.text,
-    marginVertical: 20,
-    lineHeight: 22,
+  socialIconImage: {
+    borderWidth: 1,
+    borderColor: '#eee',
+    padding: 6,
+    borderRadius: 5,
+    backgroundColor: 'rgba(250, 250, 250, 0.2)',
   },
   sessionCard: {
-    backgroundColor: '#2c2c54',
+    backgroundColor: 'rgba(250, 250, 250, 0.2)',
     padding: 16,
     borderRadius: 12,
     marginBottom: 16,
     borderWidth: 1,
     borderColor: '#eee',
   },
+  sessionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
   sessionTime: {
-    fontSize: 16,
     color: '#eee',
   },
   sessionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
     marginTop: 4,
+    marginRight: 6,
+    flexShrink: 1,
+    flexWrap: 'wrap',
   },
 });
 

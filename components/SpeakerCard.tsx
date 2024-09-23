@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
 import { Speaker } from './types'; // Import the Speaker type
 import { Link } from 'expo-router';
+import StyledText from './common/StyledText'; // Import the StyledText component
 
 interface SpeakerCardProps {
   speaker: Speaker;
@@ -14,13 +15,17 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
         <Image source={{ uri: speaker.profilePicture }} style={styles.image} resizeMode="cover" />
       ) : (
         <View style={styles.imageFallback}>
-          <Text style={styles.imageFallbackText}>No Image</Text>
+          <StyledText size="xs" font="light" style={styles.imageFallbackText}>No Image</StyledText>
         </View>
       )}
       <View style={styles.textContainer}>
-        <Text style={styles.name}>{speaker.fullName}</Text>
+        <StyledText size="lg" font="semiBold" style={styles.name}>
+          {speaker.fullName}
+        </StyledText>
         <Link href={`/speakers/${speaker.id}`}>
-          <Text style={styles.occupation}>{speaker.sessions[0]?.name || 'Session you cant afford to miss!'}</Text>
+          <StyledText size="sm" font="regular" style={styles.occupation}>
+            {speaker.sessions[0]?.name || 'Session you can’t afford to miss!'}
+          </StyledText>
         </Link>
       </View>
     </View>
@@ -29,8 +34,8 @@ const SpeakerCard: React.FC<SpeakerCardProps> = ({ speaker }) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#351e4a', // primary color
-    borderRadius: 12,
+    backgroundColor: 'rgba(250, 250, 250,0.15)',
+    borderRadius: 5,
     flexDirection: 'row',
     alignItems: 'center',
     padding: 8,
@@ -39,6 +44,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
+    borderWidth: 1,
+    borderColor: '#eee',
   },
   image: {
     width: 80,
@@ -58,19 +65,15 @@ const styles = StyleSheet.create({
   },
   imageFallbackText: {
     color: '#fff',
-    fontSize: 12,
   },
   textContainer: {
     flex: 1,
   },
   name: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#eee712', // secondary color
+    marginBottom: 4, // Adjusted for spacing between name and occupation
   },
   occupation: {
-    fontSize: 14,
-    color: '#fff', // text color
+    color: '#fff', // You can customize the color here if needed
     marginTop: 4,
   },
 });

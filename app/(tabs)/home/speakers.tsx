@@ -1,49 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import { FlatList, View, ActivityIndicator, StyleSheet, Text } from 'react-native';
-import palette from '@/constants/Colors'; // Use your color palette
+import React from 'react';
+import { FlatList, View, ActivityIndicator, StyleSheet } from 'react-native';
+import palette from '@/constants/Colors';
 import SpeakerCard from '@/components/SpeakerCard';
-import { Speaker } from '@/components/types';
+import BackgroundWrapper from '@/components/containers/BackgroundWrapper';
+import { useFetchSpeakers } from '@/hooks/useFetchSpeakers';
+import StyledText from '@/components/common/StyledText'; // Import StyledText
+import { Stack } from 'expo-router';
 
 const SpeakersTab = () => {
-  const [speakerList, setSpeakerList] = useState<Speaker[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  const fetchSpeakers = async () => {
-    setLoading(true);
-    setError(false);
-    try {
-      const res = await fetch('https://sessionize.com/api/v2/d899srzm/view/Speakers');
-      if (!res.ok) throw new Error('Failed to fetch speakers');
-      const data = await res.json();
-      setSpeakerList(data);
-    } catch (error) {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSpeakers();
-  }, []);
+  const { speakerList, loading, error } = useFetchSpeakers();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Speakers</Text>
-
-      {loading ? (
-        <ActivityIndicator size="large" color={palette.palette.secondary} />
-      ) : error ? (
-        <Text style={styles.error}>Failed to load speakers. Please try again later.</Text>
-      ) : (
-        <FlatList
-          data={speakerList}
-          renderItem={({ item }) => <SpeakerCard speaker={item} />}
-          keyExtractor={(item) => item.id}
-        />
-      )}
-    </View>
+    <BackgroundWrapper>
+      <View style={styles.container}>
+        <StyledText size="xl" font="semiBold" style={styles.header}>
+          Speakers
+        </StyledText>
+        {loading ? (
+          <ActivityIndicator size="large" color={palette.palette.secondary} />
+        ) : error ? (
+          <StyledText variant="error" style={styles.error}>
+            Failed to load speakers. Please try again later.
+          </StyledText>
+        ) : (
+          <FlatList
+            data={speakerList}
+            renderItem={({ item }) => <SpeakerCard speaker={item} />}
+            keyExtractor={(item) => item.id}
+          />
+        )}
+      </View>
+    </BackgroundWrapper>
   );
 };
 
@@ -51,18 +38,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: palette.palette.primary,
   },
   header: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: palette.palette.secondary,
-    textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: 16, // Adjusted to ensure space between the header and the list
   },
   error: {
     textAlign: 'center',
-    color: palette.palette.error,
+    marginTop: 16, // Added margin to position error message properly
   },
 });
 

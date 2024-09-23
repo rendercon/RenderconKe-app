@@ -1,43 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { FlatList, View, ActivityIndicator, StyleSheet, Text } from 'react-native';
-import SpeakerCard from './SpeakerCard'; // Assuming it's in the same directory
+import React from 'react';
+import { FlatList, View, ActivityIndicator, StyleSheet } from 'react-native';
+import SpeakerCard from './SpeakerCard';
 import palette from '@/constants/Colors'; // Use default import if Colors is exported as default
-import { Speaker } from './types'; // Import the Speaker type
+import { useFetchSpeakers } from '@/hooks/useFetchSpeakers'; // Use the custom hook
 import StyledText from './common/StyledText';
 
 const Speakers = () => {
-  const [speakerList, setSpeakerList] = useState<Speaker[]>([]); // Use Speaker[] type for the array
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  const fetchSpeakers = async () => {
-    setLoading(true);
-    setError(false);
-    try {
-      const res = await fetch('https://sessionize.com/api/v2/d899srzm/view/Speakers');
-      if (!res.ok) throw new Error('Failed to fetch speakers');
-      const data = await res.json();
-      setSpeakerList(data);
-    } catch (error) {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSpeakers();
-  }, []);
+  const { speakerList, loading, error } = useFetchSpeakers(); // Use the custom hook to fetch speakers
 
   return (
     <View style={styles.container}>
+      {/* StyledText replaces Text for a consistent font style */}
       <StyledText size="lg" font="semiBold" style={styles.header}>
         Speakers
       </StyledText>
       {loading ? (
-        <ActivityIndicator size="large" color={palette.palette.secondary} /> // Access secondary color correctly
+        <ActivityIndicator size="large" color={palette.palette.secondary} />
       ) : error ? (
-        <Text style={styles.error}>Failed to load speakers. Please try again later.</Text>
+        <StyledText variant="error" style={styles.error}>
+          Failed to load speakers. Please try again later.
+        </StyledText>
       ) : (
         <FlatList
           data={speakerList}
@@ -53,18 +35,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#1e0536', // Primary background color
+    backgroundColor: palette.palette.primary, // Consistent primary background color
   },
   header: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#eee712', // secondary color
-    textAlign: 'left',
     marginBottom: 16,
+    color: palette.palette.secondary // Removed font size and color since StyledText handles that
   },
   error: {
     textAlign: 'center',
-    color: '#ff3232', // error color
+    marginVertical: 10,
   },
 });
 
