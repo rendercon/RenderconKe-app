@@ -1,28 +1,65 @@
-import { StyleSheet, View } from 'react-native';
-import MainContainer from '@/components/containers/MainContainer';
+import { FlatList, View, ActivityIndicator, StyleSheet } from 'react-native';
+import Colors from '@/constants/Colors';
+import SpeakerCard from '@/components/cards/SpeakerCard';
+import { useFetchSpeakers } from '@/hooks/useFetchSpeakers';
 import StyledText from '@/components/common/StyledText';
-import { spacing } from '@/constants/Styles';
-// import Colors from '@/constants/Colors';
+import MainContainer from '@/components/containers/MainContainer';
+import { sizes } from '@/constants/Styles';
+import { useRouter } from 'expo-router';
 
-const home = () => {
+const Speakers = () => {
+  const router = useRouter();
+  const { speakerList, loading, error } = useFetchSpeakers();
+
   return (
-    <MainContainer backgroundImage={require('@/assets/images/bg.png')} ImageBackgroundProps={{ resizeMode: 'cover' }}>
+    <MainContainer
+      backgroundImage={require('@/assets/images/bg.png')}
+      ImageBackgroundProps={{ resizeMode: 'cover' }}
+      preset="fixed"
+      safeAreaEdges={['top']}
+    >
       <View style={styles.container}>
-        <StyledText size="lg" font="semiBold">
+        <StyledText size="xl" font="semiBold" style={styles.header}>
           Speakers
         </StyledText>
+        {loading ? (
+          <ActivityIndicator size="large" color={Colors.palette.secondary} />
+        ) : error ? (
+          <StyledText variant="error" style={styles.error}>
+            Failed to load speakers. Please try again later.
+          </StyledText>
+        ) : (
+          <FlatList
+            data={speakerList}
+            renderItem={({ item }) => (
+              <SpeakerCard speaker={item} onPress={() => router.push(`/speakers/${item.id}`)} />
+            )}
+            keyExtractor={(item) => item.id}
+            initialNumToRender={10}
+            maxToRenderPerBatch={10}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
       </View>
     </MainContainer>
   );
 };
 
-export default home;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: spacing.lg,
-    width: '100%',
-    paddingBottom: spacing.xl,
+    paddingTop: sizes.header,
+    paddingHorizontal: sizes.md,
+    paddingBottom: sizes.md,
+  },
+  header: {
+    color: Colors.palette.secondary,
+    marginVertical: sizes.md,
+  },
+  error: {
+    textAlign: 'center',
+    marginTop: 16,
   },
 });
+
+export default Speakers;

@@ -118,7 +118,7 @@ const MainContainer = (props: ScreenProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Platform.OS === 'android' ? 60 : 40,
+    // paddingTop: Platform.OS === 'android' ? 60 : 40,
   },
   containerStyle: {
     width: '100%',

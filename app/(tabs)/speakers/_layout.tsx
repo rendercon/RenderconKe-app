@@ -5,13 +5,7 @@ export default function TabLayout() {
   return (
     <Stack>
       <Stack.Screen
-        name="home"
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="speakers"
+        name="[id]"
         options={{
           headerShown: false,
         }}
