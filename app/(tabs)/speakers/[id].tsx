@@ -1,117 +1,111 @@
-import React, { useState, useMemo } from 'react';
-import { View, ScrollView, ActivityIndicator, StyleSheet, TouchableOpacity, Linking, Image } from 'react-native';
-import { Stack, useLocalSearchParams, useNavigation } from 'expo-router';
-import palette from '@/constants/Colors';
-import { useFetchSpeakers } from '@/hooks/useFetchSpeakers';
-import SpeakerHeader from '@/components/headers/SpeakerHeader';
-import BackgroundWrapper from '@/components/containers/BackgroundWrapper';
+import { Image } from 'expo-image';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { AntDesign, FontAwesome6 } from '@expo/vector-icons';
+import { useMemo } from 'react';
+import { View, StyleSheet, ActivityIndicator, Linking, Pressable } from 'react-native';
+import MainContainer from '@/components/containers/MainContainer';
+import Colors from '@/constants/Colors';
+import { sizes, spacing } from '@/constants/Styles';
 import StyledText from '@/components/common/StyledText';
-import { FontAwesome } from '@expo/vector-icons';
+import { useFetchSpeakers } from '@/hooks/useFetchSpeakers';
 
 const SpeakerPage = () => {
-  const { id } = useLocalSearchParams(); // Fetch dynamic ID from route
-  const navigation = useNavigation();
+  const { id } = useLocalSearchParams();
+
   const { speakerList, loading, error } = useFetchSpeakers();
-  const [savedSessions, setSavedSessions] = useState<{ [key: string]: boolean }>({});
+
+  const router = useRouter();
 
   const speaker = useMemo(() => speakerList.find((s) => s.id === id), [speakerList, id]);
 
   if (loading) {
-    return <ActivityIndicator size="large" color={palette.palette.secondary} style={styles.loader} />;
-  }
-
-  if (error || !speaker) {
     return (
-      <StyledText variant="error" style={styles.error}>
-        Speaker not found
-      </StyledText>
+      <MainContainer backgroundImage={require('@/assets/images/bg.png')} ImageBackgroundProps={{ resizeMode: 'cover' }}>
+        <ActivityIndicator size="large" color={Colors.palette.secondary} style={styles.loader} />
+      </MainContainer>
     );
   }
 
-  const toggleSaveSession = (sessionIndex: number) => {
-    setSavedSessions((prevState) => ({
-      ...prevState,
-      [sessionIndex]: !prevState[sessionIndex],
-    }));
+  if (error) {
+    return (
+      <MainContainer backgroundImage={require('@/assets/images/bg.png')} ImageBackgroundProps={{ resizeMode: 'cover' }}>
+        <View style={styles.container}>
+          <StyledText style={styles.error}>Speaker not found</StyledText>
+        </View>
+      </MainContainer>
+    );
+  }
+
+  const openURL = (url: string) => {
+    Linking.openURL(url);
   };
 
-  const socialMediaLinks = [
-    {
-      name: 'twitter',
-      url: speaker.socialMedia?.twitter || 'https://x.com/renderconke',
-      icon: require('@/assets/images/x.png'),
-    },
-    {
-      name: 'linkedin',
-      url: speaker.socialMedia?.linkedin || 'https://www.linkedin.com/company/renderconke/',
-      icon: require('@/assets/images/linkedin.png'),
-    },
-  ];
+  const renderLinkIcon = (linkType: string) => {
+    switch (linkType.toLowerCase()) {
+      case 'twitter':
+        return <FontAwesome6 name="x-twitter" size={36} color={Colors.palette.secondary} />;
+      case 'linkedin':
+        return <FontAwesome6 name="linkedin" size={36} color={Colors.palette.secondary} />;
+      default:
+        return <FontAwesome6 name="link" size={36} color={Colors.palette.secondary} />;
+    }
+  };
 
   return (
-    <BackgroundWrapper>
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* Back Button */}
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <FontAwesome name="arrow-left" size={18} color={palette.palette.secondary} />
-        </TouchableOpacity>
+    <MainContainer backgroundImage={require('@/assets/images/bg.png')} ImageBackgroundProps={{ resizeMode: 'cover' }}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Pressable
+            onPress={() => router.back()}
+            style={({ pressed }) => [
+              styles.backBtn,
+              { backgroundColor: pressed ? Colors.palette.cardBg : 'transparent' },
+            ]}
+          >
+            <View>
+              <AntDesign name="arrowleft" size={24} color={Colors.palette.secondary} />
+            </View>
+          </Pressable>
+          <View style={styles.name}>
+            <StyledText size="xl" font="bold" style={{ color: Colors.palette.secondary }}>
+              {speaker?.fullName}
+            </StyledText>
+          </View>
+        </View>
 
-        <SpeakerHeader
-          name={speaker.fullName}
-          occupation={speaker.occupation}
-          profilePicture={speaker.profilePicture}
-        />
+        <View style={styles.top}>
+          <Image source={{ uri: speaker?.profilePicture }} style={styles.image} contentFit="cover" />
+          <StyledText size="md" style={styles.tagline}>
+            {speaker?.tagLine}
+          </StyledText>
+        </View>
 
-        <StyledText size="md" variant="text" style={styles.bio}>
-          {speaker.bio}
-        </StyledText>
-
-        <View style={styles.socialMediaContainer}>
-          {socialMediaLinks.map((social, index) => (
-            <TouchableOpacity key={index} onPress={() => Linking.openURL(social.url)} style={styles.socialIconImage}>
-              <Image source={social.icon} />
-            </TouchableOpacity>
+        <View style={styles.row}>
+          {speaker?.links.map((link, index) => (
+            <Pressable key={index} onPress={() => openURL(link.url)} style={styles.iconBtn}>
+              <View>{renderLinkIcon(link.linkType)}</View>
+            </Pressable>
           ))}
         </View>
 
-        {speaker.sessions.map((session, index) => (
+        <StyledText style={styles.bio}>{speaker?.bio}</StyledText>
+
+        {speaker?.sessions.map((session, index) => (
           <View key={index} style={styles.sessionCard}>
-            <View style={styles.sessionHeader}>
-              <View>
-                <StyledText size="md" variant="text" style={styles.sessionTime}>
-                  {session.time}
-                </StyledText>
-                <StyledText size="sm" font="bold" style={styles.sessionTitle}>
-                  {session.name}
-                </StyledText>
-              </View>
-              <TouchableOpacity onPress={() => toggleSaveSession(index)}>
-                <FontAwesome
-                  name={savedSessions[index] ? 'bookmark' : 'bookmark-o'}
-                  size={20}
-                  color={savedSessions[index] ? palette.palette.secondary : '#ccc'}
-                />
-              </TouchableOpacity>
-            </View>
+            <StyledText size="lg" font="medium" style={{ color: Colors.palette.secondary }}>
+              {session?.name}
+            </StyledText>
           </View>
         ))}
-      </ScrollView>
-    </BackgroundWrapper>
+      </View>
+    </MainContainer>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    justifyContent: 'center',
-    marginTop: 30,
-  },
-  backButton: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
-    zIndex: 10,
-    padding: 8,
+    flex: 1,
+    padding: spacing.lg,
   },
   loader: {
     flex: 1,
@@ -119,49 +113,67 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   error: {
+    color: Colors.palette.error,
     textAlign: 'center',
     marginTop: 20,
   },
-  bio: {
-    marginTop: 0,
-    marginBottom: 20,
-    lineHeight: 22,
+  header: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.lg,
   },
-  socialMediaContainer: {
+  backBtn: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    borderRadius: spacing.sm,
+  },
+  name: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  top: {
+    alignItems: 'center',
+    marginBottom: sizes.lg,
+  },
+  image: {
+    width: sizes.cardImage,
+    height: sizes.cardImage,
+    borderRadius: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  tagline: {
+    color: Colors.palette.secondary,
+  },
+  row: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginVertical: 15,
-    gap: 16,
+    flexWrap: 'wrap',
+    gap: sizes.md,
   },
-  socialIconImage: {
-    borderWidth: 1,
-    borderColor: '#eee',
-    padding: 6,
-    borderRadius: 5,
-    backgroundColor: 'rgba(250, 250, 250, 0.2)',
+  iconBtn: {
+    backgroundColor: Colors.palette.iconBg,
+    padding: sizes.sm,
+    borderColor: Colors.palette.border,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: sizes.sm,
+  },
+  socialIcon: {
+    marginHorizontal: 15,
+  },
+  bio: {
+    fontSize: 14,
+    color: Colors.palette.text,
+    marginVertical: 20,
+    lineHeight: 22,
   },
   sessionCard: {
-    backgroundColor: 'rgba(250, 250, 250, 0.2)',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#eee',
-  },
-  sessionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 4,
-  },
-  sessionTime: {
-    color: '#eee',
-  },
-  sessionTitle: {
-    marginTop: 4,
-    marginRight: 6,
-    flexShrink: 1,
-    flexWrap: 'wrap',
+    backgroundColor: Colors.palette.cardBg,
+    padding: spacing.lg,
+    borderRadius: sizes.sm,
+    marginBottom: spacing.lg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: Colors.palette.border,
   },
 });
 

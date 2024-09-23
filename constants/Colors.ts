@@ -4,6 +4,9 @@ const text = '#fff';
 const black = '#141414';
 const errorColor = '#ff3232';
 const dark = '#000';
+const cardBgColor = '#36333b40';
+const borderColor = '#fff9f9';
+const iconBgColor = '#eee71220';
 
 export default {
   palette: {
@@ -13,5 +16,8 @@ export default {
     black: black,
     dark: dark,
     error: errorColor,
+    cardBg: cardBgColor,
+    border: borderColor,
+    iconBg: iconBgColor,
   },
 };

@@ -1,23 +1,24 @@
-import React from 'react';
 import { FlatList, View, ActivityIndicator, StyleSheet } from 'react-native';
-import palette from '@/constants/Colors';
-import SpeakerCard from '@/components/SpeakerCard';
-import BackgroundWrapper from '@/components/containers/BackgroundWrapper';
+import Colors from '@/constants/Colors';
+import SpeakerCard from '@/components/cards/SpeakerCard';
 import { useFetchSpeakers } from '@/hooks/useFetchSpeakers';
-import StyledText from '@/components/common/StyledText'; // Import StyledText
-import { Stack } from 'expo-router';
+import StyledText from '@/components/common/StyledText';
+import MainContainer from '@/components/containers/MainContainer';
+import { sizes } from '@/constants/Styles';
+import { useRouter } from 'expo-router';
 
-const SpeakersTab = () => {
+const Speakers = () => {
+  const router = useRouter();
   const { speakerList, loading, error } = useFetchSpeakers();
 
   return (
-    <BackgroundWrapper>
+    <MainContainer backgroundImage={require('@/assets/images/bg.png')} ImageBackgroundProps={{ resizeMode: 'cover' }}>
       <View style={styles.container}>
         <StyledText size="xl" font="semiBold" style={styles.header}>
           Speakers
         </StyledText>
         {loading ? (
-          <ActivityIndicator size="large" color={palette.palette.secondary} />
+          <ActivityIndicator size="large" color={Colors.palette.secondary} />
         ) : error ? (
           <StyledText variant="error" style={styles.error}>
             Failed to load speakers. Please try again later.
@@ -25,12 +26,14 @@ const SpeakersTab = () => {
         ) : (
           <FlatList
             data={speakerList}
-            renderItem={({ item }) => <SpeakerCard speaker={item} />}
+            renderItem={({ item }) => (
+              <SpeakerCard speaker={item} onPress={() => router.push(`/speakers/${item.id}`)} />
+            )}
             keyExtractor={(item) => item.id}
           />
         )}
       </View>
-    </BackgroundWrapper>
+    </MainContainer>
   );
 };
 
@@ -40,12 +43,13 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   header: {
-    marginBottom: 16, // Adjusted to ensure space between the header and the list
+    color: Colors.palette.secondary,
+    marginVertical: sizes.md,
   },
   error: {
     textAlign: 'center',
-    marginTop: 16, // Added margin to position error message properly
+    marginTop: 16,
   },
 });
 
-export default SpeakersTab;
+export default Speakers;
