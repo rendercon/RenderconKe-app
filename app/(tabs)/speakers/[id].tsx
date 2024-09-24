@@ -1,40 +1,32 @@
 import { Image } from 'expo-image';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { AntDesign, FontAwesome6 } from '@expo/vector-icons';
-import { useMemo } from 'react';
-import { View, StyleSheet, ActivityIndicator, Linking, Pressable } from 'react-native';
+import { Stack, useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
+import { AntDesign, FontAwesome6, Ionicons } from '@expo/vector-icons';
+import { useEffect } from 'react';
+import { View, StyleSheet, Linking, Pressable, Platform } from 'react-native';
 import MainContainer from '@/components/containers/MainContainer';
 import Colors from '@/constants/Colors';
 import { sizes, spacing } from '@/constants/Styles';
 import StyledText from '@/components/common/StyledText';
-import { useFetchSpeakers } from '@/hooks/useFetchSpeakers';
+import { useStore } from '@/state/store';
+import { getSession } from '@/utils/sessions';
+import { formatSessionDate } from '@/utils/formatDate';
+import { useBookmarkStore } from '@/state/bookmarks';
 
 const SpeakerPage = () => {
   const { id } = useLocalSearchParams();
+  const allSessions = useStore((state) => state.allSessions);
+  const speakers = useStore((state) => state.allSessions.speakers);
+  const speaker = speakers.find((s) => s.id === id);
 
-  const { speakerList, loading, error } = useFetchSpeakers();
+  const bookmarks = useBookmarkStore((state) => state.bookmarks);
+
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({ title: speaker?.fullName });
+  }, [speaker, navigation]);
 
   const router = useRouter();
-
-  const speaker = useMemo(() => speakerList.find((s) => s.id === id), [speakerList, id]);
-
-  if (loading) {
-    return (
-      <MainContainer backgroundImage={require('@/assets/images/bg.png')} ImageBackgroundProps={{ resizeMode: 'cover' }}>
-        <ActivityIndicator size="large" color={Colors.palette.secondary} style={styles.loader} />
-      </MainContainer>
-    );
-  }
-
-  if (error) {
-    return (
-      <MainContainer backgroundImage={require('@/assets/images/bg.png')} ImageBackgroundProps={{ resizeMode: 'cover' }}>
-        <View style={styles.container}>
-          <StyledText style={styles.error}>Speaker not found</StyledText>
-        </View>
-      </MainContainer>
-    );
-  }
 
   const openURL = (url: string) => {
     Linking.openURL(url);
@@ -58,79 +50,74 @@ const SpeakerPage = () => {
       preset="scroll"
       safeAreaEdges={['top']}
     >
+      <Stack.Screen
+        options={{
+          headerLeft: () => (
+            <AntDesign name="arrowleft" size={24} color={Colors.palette.secondary} onPress={() => router.back()} />
+          ),
+        }}
+      />
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Pressable
-            onPress={() => router.back()}
-            style={({ pressed }) => [
-              styles.backBtn,
-              { backgroundColor: pressed ? Colors.palette.cardBg : 'transparent' },
-            ]}
-          >
-            <View>
-              <AntDesign name="arrowleft" size={24} color={Colors.palette.secondary} />
-            </View>
-          </Pressable>
-          <View style={styles.name}>
-            <StyledText size="xl" font="bold" style={{ color: Colors.palette.secondary }}>
-              {speaker?.fullName}
-            </StyledText>
-          </View>
-        </View>
-
         <View style={styles.top}>
-          <Image source={{ uri: speaker?.profilePicture }} style={styles.image} contentFit="cover" />
+          <Image
+            source={
+              speaker?.profilePicture
+                ? { uri: speaker.profilePicture }
+                : require('@/assets/images/rendercon-white-logo.png')
+            }
+            style={styles.image}
+            contentFit="cover"
+          />
           <StyledText size="md" style={styles.tagline}>
             {speaker?.tagLine}
           </StyledText>
         </View>
 
         <View style={styles.row}>
-          {speaker?.links.map((link, index) => (
-            <Pressable key={index} onPress={() => openURL(link.url)} style={styles.iconBtn}>
-              <View>{renderLinkIcon(link.linkType)}</View>
-            </Pressable>
-          ))}
+          {speaker?.links &&
+            speaker?.links.map((link: { title: string; url: string; linkType: string }, index) => (
+              <Pressable key={index} onPress={() => openURL(link.url)} style={styles.iconBtn}>
+                <View>{renderLinkIcon(link.linkType)}</View>
+              </Pressable>
+            ))}
         </View>
 
         <StyledText style={styles.bio}>{speaker?.bio}</StyledText>
 
-        {speaker?.sessions.map((session, index) => (
-          <View key={index} style={styles.sessionCard}>
-            <StyledText size="lg" font="medium" style={{ color: Colors.palette.secondary }}>
-              {session?.name}
+        <StyledText size="lg" font="medium" style={styles.subtitle}>
+          Session(s)
+        </StyledText>
+
+        {speaker?.sessions.map((session: number, index) => (
+          <Pressable key={index} style={styles.sessionCard} onPress={() => router.push(`/sessions/${session}`)}>
+            <View style={styles.topRow}>
+              <StyledText size="md" font="light">
+                {formatSessionDate('2024-10-05T09:00:00Z')}
+              </StyledText>
+              <Ionicons
+                name={
+                  bookmarks.some((bookmark) => bookmark.sessionId === String(session)) ? 'bookmark' : 'bookmark-outline'
+                }
+                size={24}
+                color={Colors.palette.secondary}
+              />
+            </View>
+            <StyledText size="md" font="medium" style={{ color: Colors.palette.secondary }}>
+              {getSession(session, allSessions).title}
             </StyledText>
-          </View>
+          </Pressable>
         ))}
       </View>
     </MainContainer>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: spacing.lg,
-  },
-  loader: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  error: {
-    color: Colors.palette.error,
-    textAlign: 'center',
-  },
-  header: {
+    paddingTop: Platform.OS === 'android' ? sizes.header : sizes.md,
+    paddingHorizontal: sizes.md,
+    paddingBottom: sizes.xxxl,
     width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  backBtn: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    borderRadius: spacing.sm,
   },
   name: {
     flex: 1,
@@ -171,13 +158,26 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     lineHeight: 22,
   },
+  subtitle: {
+    color: Colors.palette.secondary,
+    marginVertical: sizes.md,
+  },
   sessionCard: {
+    width: '100%',
     backgroundColor: Colors.palette.cardBg,
     padding: spacing.lg,
     borderRadius: sizes.sm,
     marginBottom: spacing.lg,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: Colors.palette.border,
+    flexDirection: 'column',
+    gap: spacing.lg,
+  },
+  topRow: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });
 

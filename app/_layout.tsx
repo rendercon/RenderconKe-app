@@ -4,6 +4,8 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { differenceInMinutes } from 'date-fns';
+import { useStore } from '@/state/store';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -43,6 +45,18 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  const { refreshData, lastRefreshed } = useStore();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!lastRefreshed || differenceInMinutes(new Date(), new Date(lastRefreshed)) > 5) {
+        await refreshData();
+      }
+    };
+
+    fetchData();
+  }, [lastRefreshed, refreshData]);
+
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

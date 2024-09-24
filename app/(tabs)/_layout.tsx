@@ -16,6 +16,12 @@ export default function TabLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="sessions"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

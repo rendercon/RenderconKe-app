@@ -5,7 +5,8 @@ const black = '#141414';
 const errorColor = '#ff3232';
 const dark = '#000';
 const cardBgColor = '#36333b40';
-const borderColor = '#fff9f9';
+const cardBorderColor = '#36333b';
+const borderColor = '#fff9f940';
 const iconBgColor = '#eee71220';
 
 export default {
@@ -17,6 +18,7 @@ export default {
     dark: dark,
     error: errorColor,
     cardBg: cardBgColor,
+    cardBorder: cardBorderColor,
     border: borderColor,
     iconBg: iconBgColor,
   },

@@ -1,5 +1,5 @@
 import { View, StyleSheet, Pressable } from 'react-native';
-import { Speaker } from '../types';
+import { Speaker } from '@/constants/types';
 import Colors from '@/constants/Colors';
 import { sizes, spacing, blurhash } from '@/constants/Styles';
 import StyledText from '../common/StyledText';
@@ -52,7 +52,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: spacing.sm,
-    marginBottom: spacing.lg,
   },
   image: {
     width: 80,
