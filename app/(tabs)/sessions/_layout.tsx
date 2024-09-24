@@ -2,7 +2,7 @@ import React from 'react';
 import { Stack } from 'expo-router';
 import Colors from '@/constants/Colors';
 
-export default function TabLayout() {
+export default function SessionsLayout() {
   return (
     <Stack>
       <Stack.Screen
@@ -10,7 +10,6 @@ export default function TabLayout() {
         options={{
           headerTransparent: true,
           headerTintColor: Colors.palette.secondary,
-          headerTitleAlign: 'center',
           headerStyle: {
             backgroundColor: Colors.palette.primary + 'cc',
           },

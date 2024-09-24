@@ -1,15 +1,15 @@
-import { FlatList, View, ActivityIndicator, StyleSheet } from 'react-native';
+import { FlatList, View, StyleSheet } from 'react-native';
 import Colors from '@/constants/Colors';
 import SpeakerCard from '@/components/cards/SpeakerCard';
-import { useFetchSpeakers } from '@/hooks/useFetchSpeakers';
 import StyledText from '@/components/common/StyledText';
 import MainContainer from '@/components/containers/MainContainer';
 import { sizes } from '@/constants/Styles';
 import { useRouter } from 'expo-router';
+import { useStore } from '@/state/store';
 
 const Speakers = () => {
   const router = useRouter();
-  const { speakerList, loading, error } = useFetchSpeakers();
+  const speakers = useStore((state) => state.allSessions.speakers);
 
   return (
     <MainContainer
@@ -22,24 +22,16 @@ const Speakers = () => {
         <StyledText size="xl" font="semiBold" style={styles.header}>
           Speakers
         </StyledText>
-        {loading ? (
-          <ActivityIndicator size="large" color={Colors.palette.secondary} />
-        ) : error ? (
-          <StyledText variant="error" style={styles.error}>
-            Failed to load speakers. Please try again later.
-          </StyledText>
-        ) : (
-          <FlatList
-            data={speakerList}
-            renderItem={({ item }) => (
-              <SpeakerCard speaker={item} onPress={() => router.push(`/speakers/${item.id}`)} />
-            )}
-            keyExtractor={(item) => item.id}
-            initialNumToRender={10}
-            maxToRenderPerBatch={10}
-            showsVerticalScrollIndicator={false}
-          />
-        )}
+        <FlatList
+          data={speakers}
+          renderItem={({ item }) => <SpeakerCard speaker={item} onPress={() => router.push(`/speakers/${item.id}`)} />}
+          keyExtractor={(item) => item.id}
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={{ height: sizes.md }} />}
+          ListEmptyComponent={<StyledText style={styles.error}>No speakers found. Please try again later.</StyledText>}
+        />
       </View>
     </MainContainer>
   );

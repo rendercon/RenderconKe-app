@@ -1,0 +1,86 @@
+{
+  "sessions": [
+    {
+      "id": "2e115a1f-803c-4c38-a0c9-a0c809457d51",
+      "title": "Registration",
+      "description": null,
+      "startsAt": "2024-05-15T01:00:00Z",
+      "endsAt": "2024-05-15T04:00:00Z",
+      "isServiceSession": true,
+      "isPlenumSession": false,
+      "speakers": [],
+      "categoryItems": [],
+      "questionAnswers": [],
+      "roomId": 45058,
+      "liveUrl": null,
+      "recordingUrl": null,
+      "status": null,
+      "isInformed": false,
+      "isConfirmed": false
+    },
+    {
+      "id": "be87952a-fb0d-409a-a953-dde2e0364e22",
+      "title": "Registration",
+      "description": null,
+      "startsAt": "2024-05-15T14:00:00Z",
+      "endsAt": "2024-05-15T16:00:00Z",
+      "isServiceSession": true,
+      "isPlenumSession": false,
+      "speakers": [],
+      "categoryItems": [],
+      "questionAnswers": [],
+      "roomId": 45058,
+      "liveUrl": null,
+      "recordingUrl": null,
+      "status": null,
+      "isInformed": false,
+      "isConfirmed": false
+    }
+  ],
+  "speakers": [
+    {
+      "id": "58970fb3-d2e7-419c-944d-14d7d6335c92",
+      "firstName": "An Amazing",
+      "lastName": "Speaker",
+      "bio": "Hold tight till we reveal the detail of this speaker",
+      "tagLine": "Speaker @ ReactConf",
+      "profilePicture": null,
+      "isTopSpeaker": false,
+      "links": [],
+      "sessions": [665489],
+      "fullName": "An Amazing Speaker",
+      "categoryItems": [],
+      "questionAnswers": []
+    },
+    {
+      "id": "fd5447af-f5ce-47f0-8b2f-ee402233cf9f",
+      "firstName": "An Amazing",
+      "lastName": "Speaker",
+      "bio": "Hold tight till we reveal the detail of this speaker",
+      "tagLine": "Speaker @ ReactConf",
+      "profilePicture": null,
+      "isTopSpeaker": false,
+      "links": [],
+      "sessions": [665488],
+      "fullName": "An Amazing Speaker",
+      "categoryItems": [],
+      "questionAnswers": []
+    }
+  ],
+  "questions": [
+    {
+      "id": 69203,
+      "question": "Github",
+      "questionType": "Short_Text",
+      "sort": 16
+    }
+  ],
+  "categories": [],
+  "rooms": [
+    {
+      "id": 1,
+      "name": "Room 1",
+      "sort": 0
+    }
+  ]
+}

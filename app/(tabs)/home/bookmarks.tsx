@@ -1,28 +1,83 @@
-import { StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import MainContainer from '@/components/containers/MainContainer';
 import StyledText from '@/components/common/StyledText';
-import { spacing } from '@/constants/Styles';
-// import Colors from '@/constants/Colors';
+import { sizes, spacing } from '@/constants/Styles';
+import { useBookmarkStore } from '@/state/bookmarks';
+import { useStore } from '@/state/store';
+import Colors from '@/constants/Colors';
+import { getSpeaker, getRoom } from '@/utils/sessions';
+import SessionCard from '@/components/cards/SessionCard';
+import { useRouter } from 'expo-router';
 
-const home = () => {
+export default function BookmarksPage() {
+  const router = useRouter();
+
+  const bookmarks = useBookmarkStore((state) => state.bookmarks);
+  const allSessions = useStore((state) => state.allSessions);
+  const sessions = useStore((state) => state.allSessions.sessions);
+  const bookmarkedSessions = sessions.filter((session) =>
+    bookmarks.some((bookmark) => bookmark.sessionId === session.id),
+  );
+
   return (
-    <MainContainer backgroundImage={require('@/assets/images/bg.png')} ImageBackgroundProps={{ resizeMode: 'cover' }}>
+    <MainContainer
+      backgroundImage={require('@/assets/images/bg.png')}
+      ImageBackgroundProps={{ resizeMode: 'cover' }}
+      preset="scroll"
+      safeAreaEdges={['top']}
+    >
       <View style={styles.container}>
-        <StyledText size="lg" font="semiBold">
-          Bookmarks
+        <StyledText size="xl" font="semiBold" style={styles.header}>
+          Bookmarked Sessions
         </StyledText>
+
+        <FlatList
+          data={bookmarkedSessions}
+          renderItem={({ item }) => {
+            const speakers = item.speakers.map((speakerId) => getSpeaker(speakerId, allSessions));
+            return (
+              <SessionCard
+                session={{ ...item, room: 'TBA' }}
+                speakers={speakers}
+                room={item?.roomId ? getRoom(item.roomId, allSessions).name : 'TBA'}
+                onPress={() => router.push(`/sessions/${item.id}`)}
+              />
+            );
+          }}
+          keyExtractor={(item) => item.id}
+          initialNumToRender={10}
+          maxToRenderPerBatch={10}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={{ height: sizes.md }} />}
+          ListEmptyComponent={
+            <StyledText size="base" style={styles.error}>
+              No bookmarked sessions found.
+            </StyledText>
+          }
+          scrollEnabled={false}
+        />
       </View>
     </MainContainer>
   );
-};
-
-export default home;
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: spacing.lg,
+    paddingTop: sizes.header,
+    paddingHorizontal: sizes.md,
+    paddingBottom: sizes.xxxl,
     width: '100%',
-    paddingBottom: spacing.xl,
+  },
+  header: {
+    color: Colors.palette.secondary,
+    marginVertical: sizes.xl,
+  },
+  sessions: {
+    // flex: 1,
+    gap: spacing.md,
+  },
+  error: {
+    textAlign: 'center',
   },
 });
