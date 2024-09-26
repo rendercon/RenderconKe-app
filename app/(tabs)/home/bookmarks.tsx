@@ -7,11 +7,8 @@ import { useStore } from '@/state/store';
 import Colors from '@/constants/Colors';
 import { getSpeaker, getRoom } from '@/utils/sessions';
 import SessionCard from '@/components/cards/SessionCard';
-import { useRouter } from 'expo-router';
 
 export default function BookmarksPage() {
-  const router = useRouter();
-
   const bookmarks = useBookmarkStore((state) => state.bookmarks);
   const allSessions = useStore((state) => state.allSessions);
   const sessions = useStore((state) => state.allSessions.sessions);
@@ -35,14 +32,8 @@ export default function BookmarksPage() {
           data={bookmarkedSessions}
           renderItem={({ item }) => {
             const speakers = item.speakers.map((speakerId) => getSpeaker(speakerId, allSessions));
-            return (
-              <SessionCard
-                session={{ ...item, room: 'TBA' }}
-                speakers={speakers}
-                room={item?.roomId ? getRoom(item.roomId, allSessions)?.name : 'TBA'}
-                onPress={() => router.push(`/sessions/${item.id}`)}
-              />
-            );
+            const room = item?.roomId ? getRoom(item.roomId, allSessions)?.name : 'TBA';
+            return <SessionCard session={{ ...item, room, speakers }} />;
           }}
           keyExtractor={(item) => item.id}
           initialNumToRender={10}

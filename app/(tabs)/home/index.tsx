@@ -1,62 +1,141 @@
-import { FlatList, StyleSheet, View } from 'react-native';
+import { useScrollToTop } from '@react-navigation/native';
+import { useFocusEffect } from 'expo-router';
+import { useState } from 'react';
+import { FlatList, StyleSheet, View, ViewToken } from 'react-native';
+import Animated, { useAnimatedRef, useSharedValue, useAnimatedScrollHandler } from 'react-native-reanimated';
+
 import MainContainer from '@/components/containers/MainContainer';
 import StyledText from '@/components/common/StyledText';
 import { sizes, spacing } from '@/constants/Styles';
 import Colors from '@/constants/Colors';
 import { useStore } from '@/state/store';
-import { useRouter } from 'expo-router';
 import SessionCard from '@/components/cards/SessionCard';
-import { getRoom, getSpeaker } from '@/utils/sessions';
 import ListHeaderButton from '@/components/headers/ListHeaderButton';
 import { format } from 'date-fns';
+import { Session } from '@/constants/types';
+
+type SessionItem =
+  | {
+      type: 'session';
+      day: number;
+      item: Session;
+    }
+  | {
+      type: 'section-header';
+      day: number;
+    };
+
+const headerHeight = 50;
+
+const AnimatedFlatList = Animated.createAnimatedComponent(FlatList<SessionItem>);
 
 export default function Schedule() {
-  const router = useRouter();
-  const allSessions = useStore((state) => state.allSessions);
-  const sessions = useStore((state) => state.allSessions.sessions);
+  const scrollRef = useAnimatedRef<FlatList>();
+  useScrollToTop(scrollRef as any);
+  const [shouldShowDayOneHeader, setShouldShowDayOneHeader] = useState(true);
+
+  const scrollOffset = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler((event) => {
+    scrollOffset.value = event.contentOffset.y;
+  });
+
+  const { dayOne, dayTwo } = useStore((state) => state.schedule);
+  const refreshSchedule = useStore((state) => state.refreshData);
+
+  useFocusEffect(() => {
+    refreshSchedule({ ttlMs: 60_000 });
+  });
+
+  const scrollToSection = ({ isDayOne }: { isDayOne: boolean }) => {
+    // console.log('scrollToSection', isDayOne, dayOne.length, dayTwo.length);
+    const index = isDayOne ? 0 : dayOne.length;
+    scrollRef.current?.scrollToIndex({
+      index,
+      animated: true,
+      viewOffset: isDayOne ? headerHeight : 0,
+    });
+  };
+
+  const onViewableItemsChanged = (items: {
+    viewableItems: ViewToken<SessionItem>[];
+    changed: ViewToken<SessionItem>[];
+  }) => {
+    const topVisibleIndex = items.viewableItems?.[0]?.index || 0;
+    const isDayOneThreshold = topVisibleIndex <= dayOne.length;
+    const isDayTwoThreshold = topVisibleIndex >= dayOne.length;
+
+    if (!shouldShowDayOneHeader && isDayOneThreshold) {
+      setShouldShowDayOneHeader(true);
+    }
+
+    if (shouldShowDayOneHeader && isDayTwoThreshold) {
+      setShouldShowDayOneHeader(false);
+    }
+  };
+
+  const data = [
+    ...dayOne.map((item) => ({ type: 'session', day: 1, item })),
+    { type: 'section-header', day: 2 },
+    ...dayTwo.map((item) => ({ type: 'session', day: 2, item })),
+  ] as SessionItem[];
 
   return (
     <MainContainer
       backgroundImage={require('@/assets/images/bg.png')}
       ImageBackgroundProps={{ resizeMode: 'cover' }}
-      preset="scroll"
+      preset="fixed"
       safeAreaEdges={['top']}
     >
-      <View style={styles.container}>
-        <FlatList
-          data={sessions}
+      <Animated.View style={styles.container}>
+        <AnimatedFlatList
+          ref={scrollRef}
+          onScroll={scrollHandler}
+          onViewableItemsChanged={onViewableItemsChanged}
+          data={data}
+          contentContainerStyle={{ paddingTop: spacing.xl, paddingBottom: spacing.xl }}
+          scrollEventThrottle={8}
+          stickyHeaderIndices={[0]}
           ListHeaderComponent={() => {
             return (
               <View style={[styles.sectionHeader]}>
                 <ListHeaderButton
                   title={format('2024-10-04T00:00:00Z', 'EEE')}
                   subtitle="Day 1"
-                  isBold={true}
-                  onPress={() => {}}
+                  isBold={shouldShowDayOneHeader}
+                  onPress={() => scrollToSection({ isDayOne: true })}
                 />
                 <ListHeaderButton
                   title={format('2024-10-05T00:00:00Z', 'EEE')}
                   subtitle="Day 2"
-                  isBold={false}
-                  onPress={() => {}}
+                  isBold={!shouldShowDayOneHeader}
+                  onPress={() => scrollToSection({ isDayOne: false })}
                 />
               </View>
             );
           }}
           renderItem={({ item }) => {
-            const speakers = item.speakers.map((speakerId) => getSpeaker(speakerId, allSessions));
-            return (
-              <SessionCard
-                session={{ ...item, room: '' }}
-                speakers={speakers}
-                room={item?.roomId ? getRoom(item.roomId, allSessions)?.name : 'TBA'}
-                onPress={() => router.push(`/sessions/${item.id}`)}
-              />
-            );
+            const isDayOne = item.day === 1;
+            if (item.type === 'section-header') {
+              return (
+                <View style={[styles.sectionHeader]}>
+                  <ListHeaderButton
+                    title={format('2024-10-04T00:00:00Z', 'EEE')}
+                    subtitle="Day 1"
+                    isBold={isDayOne}
+                    onPress={() => scrollToSection({ isDayOne: true })}
+                  />
+                  <ListHeaderButton
+                    title={format('2024-10-05T00:00:00Z', 'EEE')}
+                    subtitle="Day 2"
+                    isBold={!isDayOne}
+                    onPress={() => scrollToSection({ isDayOne: false })}
+                  />
+                </View>
+              );
+            } else {
+              return <SessionCard session={item.item} />;
+            }
           }}
-          keyExtractor={(item) => item.id}
-          initialNumToRender={10}
-          maxToRenderPerBatch={10}
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={() => <View style={{ height: sizes.md }} />}
           ListEmptyComponent={
@@ -64,9 +143,8 @@ export default function Schedule() {
               No sessions found.
             </StyledText>
           }
-          scrollEnabled={false}
         />
-      </View>
+      </Animated.View>
     </MainContainer>
   );
 }
@@ -74,7 +152,7 @@ export default function Schedule() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: sizes.header + 40,
+    paddingTop: sizes.header + 20,
     paddingHorizontal: sizes.md,
     paddingBottom: sizes.xxxl,
     width: '100%',
@@ -84,6 +162,7 @@ const styles = StyleSheet.create({
     marginVertical: sizes.md,
   },
   sectionHeader: {
+    backgroundColor: Colors.palette.primary,
     marginBottom: sizes.md,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,

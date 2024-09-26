@@ -42,7 +42,8 @@
     "react-native-web": "~0.19.10",
     "use-async-effect": "^2.2.7",
     "zustand": "^5.0.0-rc.2",
-    "expo-dev-client": "~4.0.27"
+    "expo-dev-client": "~4.0.27",
+    "react-native-gesture-handler": "~2.16.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
