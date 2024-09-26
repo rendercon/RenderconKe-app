@@ -49,7 +49,7 @@ export default function Schedule() {
               <SessionCard
                 session={{ ...item, room: '' }}
                 speakers={speakers}
-                room={item?.roomId ? getRoom(item.roomId, allSessions).name : 'TBA'}
+                room={item?.roomId ? getRoom(item.roomId, allSessions)?.name : 'TBA'}
                 onPress={() => router.push(`/sessions/${item.id}`)}
               />
             );

@@ -39,7 +39,7 @@ export default function BookmarksPage() {
               <SessionCard
                 session={{ ...item, room: 'TBA' }}
                 speakers={speakers}
-                room={item?.roomId ? getRoom(item.roomId, allSessions).name : 'TBA'}
+                room={item?.roomId ? getRoom(item.roomId, allSessions)?.name : 'TBA'}
                 onPress={() => router.push(`/sessions/${item.id}`)}
               />
             );
