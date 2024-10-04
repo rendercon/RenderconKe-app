@@ -5,6 +5,7 @@ export const sizes = {
   xl: 26,
   xxl: 32,
   xxxl: 40,
+  xxxxl: 48,
   header: 60,
   card: 220,
   cardImage: 150,
