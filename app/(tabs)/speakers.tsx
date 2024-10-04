@@ -23,6 +23,7 @@ const Speakers = () => {
           Speakers
         </StyledText>
         <FlatList
+          contentContainerStyle={{ paddingBottom: sizes.xxxxl }}
           data={speakers}
           renderItem={({ item }) => <SpeakerCard speaker={item} onPress={() => router.push(`/speakers/${item.id}`)} />}
           keyExtractor={(item) => item.id}

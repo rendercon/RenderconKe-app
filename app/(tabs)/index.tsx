@@ -92,7 +92,7 @@ export default function Schedule() {
           onScroll={scrollHandler}
           onViewableItemsChanged={onViewableItemsChanged}
           data={data}
-          contentContainerStyle={{ paddingTop: spacing.xl, paddingBottom: spacing.xl }}
+          contentContainerStyle={{ paddingTop: spacing.xl, paddingBottom: spacing.xxl }}
           scrollEventThrottle={8}
           stickyHeaderIndices={[0]}
           ListHeaderComponent={() => {
