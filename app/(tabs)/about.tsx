@@ -68,7 +68,7 @@ const home = () => {
         </View>
 
         <StyledText size="xl" font="semiBold" style={styles.header}>
-          Sponsors
+          Organizer
         </StyledText>
 
         <View style={styles.sponsors}>
@@ -77,6 +77,13 @@ const home = () => {
             style={{ width: '100%', height: 100 }}
             contentFit="contain"
           />
+        </View>
+
+        <StyledText size="xl" font="semiBold" style={styles.header}>
+          Partners & Sponsors
+        </StyledText>
+
+        <View style={styles.sponsors}>
           <View style={styles.row}>
             <Image
               source={require('@/assets/images/gallery/lemonade.png')}
@@ -92,26 +99,20 @@ const home = () => {
         </View>
 
         <StyledText size="xl" font="semiBold" style={styles.header}>
-          Organizers
+          Past Sponsors & Partners
         </StyledText>
 
         <View style={styles.sponsors}>
           <View style={styles.row}>
             <Image
               source={require('@/assets/images/gallery/devkenya_logo.png')}
-              style={{ width: '33%', height: 80, borderRadius: spacing.sm }}
-              contentFit="contain"
-            />
-
-            <Image
-              source={require('@/assets/images/gallery/Reactdevske_logo.png')}
-              style={{ width: '33%', height: 80 }}
+              style={{ width: '40%', height: 80, borderRadius: spacing.sm }}
               contentFit="contain"
             />
 
             <Image
               source={require('@/assets/images/gallery/osca_nairobi_logo.jpg')}
-              style={{ width: '33%', height: 80, borderRadius: spacing.sm }}
+              style={{ width: '40%', height: 80, borderRadius: spacing.sm }}
               contentFit="contain"
             />
           </View>
