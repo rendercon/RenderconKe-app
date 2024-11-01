@@ -43,7 +43,8 @@
     "use-async-effect": "^2.2.7",
     "zustand": "^5.0.0-rc.2",
     "expo-dev-client": "~4.0.27",
-    "react-native-gesture-handler": "~2.16.1"
+    "react-native-gesture-handler": "~2.16.1",
+    "expo-updates": "~0.26.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
