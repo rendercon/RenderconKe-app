@@ -8,7 +8,7 @@ import { AntDesign } from '@expo/vector-icons';
 
 const home = () => {
   const handleOpenLink = () => {
-    Linking.openURL('https://bit.ly/rcke23pics');
+    Linking.openURL('https://bit.ly/rcke24pics');
   };
 
   return (
@@ -59,7 +59,7 @@ const home = () => {
             >
               <View style={styles.centered}>
                 <StyledText font="medium" size="md" style={styles.buttonText}>
-                  View Gallery
+                  View Gallery RenderConKe '24
                 </StyledText>
                 <AntDesign name="arrowright" size={16} color={Colors.palette.primary} />
               </View>

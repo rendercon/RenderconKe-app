@@ -39,3 +39,6 @@ yarn-error.*
 
 expo-env.d.ts
 # @end expo-cli
+
+# eas build
+renderconke-6097b567a2ed.json
